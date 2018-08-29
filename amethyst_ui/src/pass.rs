@@ -555,6 +555,7 @@ fn cached_color_texture(
                 dynamic: false,
                 format: None,
                 channel: None,
+                kind: None,
             };
             let texture_data = TextureData::Rgba(color, meta);
             loader.load_from_data(texture_data, (), storage)

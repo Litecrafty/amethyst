@@ -9,7 +9,7 @@ use amethyst_assets::{
 };
 use amethyst_core::specs::prelude::{Entity, Read, ReadExpect};
 use gfx::format::{ChannelType, SurfaceType};
-use gfx::texture::SamplerInfo;
+use gfx::texture::{Kind, SamplerInfo};
 use gfx::traits::Pod;
 use tex::{Texture, TextureBuilder};
 use Renderer;
@@ -30,6 +30,8 @@ pub struct TextureMetadata {
     pub format: Option<SurfaceType>,
     /// Channel type
     pub channel: Option<ChannelType>,
+    /// Texture kind
+    pub kind: Option<Kind>,
 }
 
 impl Default for TextureMetadata {
@@ -41,6 +43,7 @@ impl Default for TextureMetadata {
             dynamic: false,
             format: None,
             channel: None,
+            kind: None,
         }
     }
 }
@@ -81,6 +84,12 @@ impl TextureMetadata {
         self.dynamic = d;
         self
     }
+
+    /// Texture kind
+    pub fn with_kind(mut self, kind: Kind) -> Self {
+        self.kind = Some(kind);
+        self
+    }
 }
 
 /// Texture data for loading
@@ -110,6 +119,10 @@ pub enum TextureData {
 
     /// Byte data
     U64(Vec<u64>, TextureMetadata),
+
+    /// Cube Image data
+    #[serde(skip)]
+    CubeImage([ImageData; 6], TextureMetadata),
 }
 
 impl From<[f32; 4]> for TextureData {
@@ -378,6 +391,10 @@ pub fn create_texture_asset(
                 .create_texture(tb)
                 .chain_err(|| "Failed to build texture")
         }
+
+        CubeImage(image_data, options) => {
+            create_cubemap_asset_from_images(image_data, options, renderer)
+        }
     };
     t.map(|t| ProcessingState::Loaded(t))
 }
@@ -413,6 +430,10 @@ where
         Some(channel) => tb = tb.with_channel_type(channel),
         _ => (),
     }
+    match metadata.kind {
+        Some(kind) => tb = tb.with_kind(kind),
+        _ => (),
+    }
 
     tb
 }
@@ -439,6 +460,38 @@ fn create_texture_asset_from_image(
         TextureBuilder::new(rgba.into_raw())
             .with_format(fmt)
             .with_size(w as u16, h as u16),
+        options,
+    );
+    renderer
+        .create_texture(tb)
+        .chain_err(|| "Failed to create texture from texture data")
+}
+
+fn create_cubemap_asset_from_images(
+    images: [ImageData; 6],
+    options: TextureMetadata,
+    renderer: &mut Renderer,
+) -> Result<Texture> {
+    let fmt = SurfaceType::R8_G8_B8_A8;
+    let rgba = &images[0].rgba;
+    let w = rgba.width();
+    let h = rgba.height();
+    if w > u16::max_value() as u32 || h > u16::max_value() as u32 {
+        bail!(
+            "Unsupported texture size (expected: ({}, {}), got: ({}, {})",
+            u16::max_value(),
+            u16::max_value(),
+            w,
+            h
+        );
+    }
+    
+    let data: Vec<u8> = images.iter().map(|val| val.clone().rgba.into_raw()).flat_map(|v| v).collect();
+
+    let tb = apply_options(
+        TextureBuilder::new(data)
+            .with_format(fmt)
+            .with_kind(Kind::Cube(w as u16)),
         options,
     );
     renderer

@@ -6,7 +6,7 @@ use error::Result;
 use formats::TextureData;
 use gfx::format::{ChannelType, SurfaceType};
 pub use gfx::texture::{FilterMethod, WrapMode};
-use gfx::texture::{Info, Mipmap, SamplerInfo};
+use gfx::texture::{AaMode, Info, Kind, Mipmap, SamplerInfo};
 use gfx::traits::Pod;
 use std::marker::PhantomData;
 use types::{ChannelFormat, Factory, RawShaderResourceView, RawTexture, Sampler, SurfaceFormat};
@@ -91,7 +91,6 @@ where
         use gfx::format::{ChannelTyped, SurfaceTyped};
         use gfx::memory::Bind;
         use gfx::memory::Usage;
-        use gfx::texture::{AaMode, Kind};
 
         TextureBuilder {
             data: data,
@@ -124,7 +123,6 @@ where
 
     /// Sets the texture width and height in pixels.
     pub fn with_size(mut self, w: u16, h: u16) -> Self {
-        use gfx::texture::{AaMode, Kind};
         self.info.kind = Kind::D2(w, h, AaMode::Single);
         self
     }
@@ -148,6 +146,12 @@ where
         self
     }
 
+    /// Sets the texture kind
+    pub fn with_kind(mut self, kind: Kind) -> Self {
+        self.info.kind = kind;
+        self
+    }
+
     /// Builds and returns the new texture.
     pub fn build(self, fac: &mut Factory) -> Result<Texture> {
         use gfx::format::Swizzle;
@@ -156,31 +160,61 @@ where
         use gfx::Factory;
         use std::mem::size_of;
 
-        // This variable has to live here to make sure the flipped
-        // buffer lives long enough. (If one exists)
-        let mut v_flip_buffer;
-        let mut data = self.data.as_ref();
+        let mut v_flip_buffer = Vec::with_capacity(6);
 
-        if cfg!(feature = "opengl") {
-            let pixel_width = (self.info.format.get_total_bits() / 8) as usize / size_of::<T>();
-            v_flip_buffer = Vec::with_capacity(data.len());
-            let (w, h, _, _) = self.info.kind.get_dimensions();
-            let w = w as usize;
-            let h = h as usize;
-            for y in 0..h {
-                for x in 0..(w * pixel_width) {
-                    v_flip_buffer.push(data[x + (h - y - 1) * w * pixel_width]);
-                    // Uncomment this if you need to debug this.
-                    //println!("x: {}, y: {}, w: {}, h: {}, pw: {}", x, y, w, h, pixel_width);
+        let data = match self.info.kind {
+            Kind::Cube(_) => {
+                let mut data = self.data.as_ref();
+                let slice_len = data.len() / 6;
+                let (w, h, a, _) = self.info.kind.get_dimensions();
+                let a = a as usize;
+                let mut arr = Vec::with_capacity(a);
+                
+                for i in 0..a {
+                    arr.push(cast_slice(&data[(i * slice_len)..((i+1) * slice_len)]));
+
+                    if cfg!(feature = "opengl") {
+                        let pixel_width = (self.info.format.get_total_bits() / 8) as usize / size_of::<T>();
+                        v_flip_buffer.push(Vec::with_capacity(slice_len));
+                        let w = w as usize;
+                        let h = h as usize;
+                        for y in 0..h {
+                            for x in 0..(w * pixel_width) {
+                                //v_flip_buffer[i].push(data[(i * slice_len)..((i+1 * slice_len))][x + (h - y - 1) * w * pixel_width]);
+                                // Uncomment this if you need to debug this.
+                                //println!("x: {}, y: {}, w: {}, h: {}, pw: {}", x, y, w, h, pixel_width);
+                            }
+                        }
+                    }
                 }
+                arr
+            },
+            _ => {
+                let mut data = self.data.as_ref();
+                let mut arr = Vec::with_capacity(1);
+                if cfg!(feature = "opengl") {
+                    let pixel_width = (self.info.format.get_total_bits() / 8) as usize / size_of::<T>();
+                    v_flip_buffer.push(Vec::with_capacity(data.len()));
+                    let (w, h, _, _) = self.info.kind.get_dimensions();
+                    let w = w as usize;
+                    let h = h as usize;
+                    for y in 0..h {
+                        for x in 0..(w * pixel_width) {
+                            v_flip_buffer[0].push(data[x + (h - y - 1) * w * pixel_width]);
+                            // Uncomment this if you need to debug this.
+                            //println!("x: {}, y: {}, w: {}, h: {}, pw: {}", x, y, w, h, pixel_width);
+                        }
+                    }
+                    arr.push(cast_slice(&v_flip_buffer[0].as_ref()));
+                }
+                arr
             }
-            data = &v_flip_buffer;
-        }
+        };
 
         let tex = fac.create_texture_raw(
             self.info,
             Some(self.channel_type),
-            Some((&[cast_slice(data)], Mipmap::Provided)),
+            Some((&data, Mipmap::Provided)),
         )?;
 
         let desc = ResourceDesc {

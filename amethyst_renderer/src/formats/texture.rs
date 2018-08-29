@@ -473,6 +473,7 @@ fn create_cubemap_asset_from_images(
     renderer: &mut Renderer,
 ) -> Result<Texture> {
     let fmt = SurfaceType::R8_G8_B8_A8;
+    let chan = options.channel.unwrap_or(ChannelType::Srgb);
     let rgba = &images[0].rgba;
     let w = rgba.width();
     let h = rgba.height();
@@ -491,6 +492,7 @@ fn create_cubemap_asset_from_images(
     let tb = apply_options(
         TextureBuilder::new(data)
             .with_format(fmt)
+            .with_channel_type(chan)
             .with_kind(Kind::Cube(w as u16)),
         options,
     );

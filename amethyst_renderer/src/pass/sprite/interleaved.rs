@@ -51,7 +51,7 @@ where
     }
 
     fn attributes() -> Attributes<'static> {
-        <SpriteInstance as Query<(DirX, DirY, Pos, OffsetU, OffsetV)>>::QUERIED_ATTRIBUTES
+        <SpriteInstance as Query<(DirX, DirY, Pos, OffsetU, OffsetV, Depth)>>::QUERIED_ATTRIBUTES
     }
 }
 
@@ -74,6 +74,7 @@ impl Pass for DrawSprite {
 
         let mut builder = effect.simple(VERT_SRC, FRAG_SRC);
         builder
+            .without_back_face_culling()
             .with_raw_constant_buffer(
                 "ViewArgs",
                 mem::size_of::<<ViewArgs as Uniform>::Std140>(),
@@ -285,7 +286,7 @@ impl SpriteBatch {
 
             instance_data.extend(&[
                 dir_x.x, dir_x.y, dir_y.x, dir_y.y, pos.x, pos.y, uv_left, uv_right, uv_bottom,
-                uv_top,
+                uv_top, pos.z,
             ]);
             num_instances += 1;
 

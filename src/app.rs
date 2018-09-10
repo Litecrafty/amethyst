@@ -5,6 +5,7 @@ use assets::{Loader, Source};
 use core::frame_limiter::{FrameLimiter, FrameRateLimitConfig, FrameRateLimitStrategy};
 use core::shrev::{EventChannel, ReaderId};
 use core::timing::{Stopwatch, Time};
+use core::Named;
 use ecs::common::Errors;
 use ecs::prelude::{Component, World};
 use error::{Error, Result};
@@ -21,7 +22,6 @@ use std::sync::Arc;
 use std::time::Duration;
 #[cfg(feature = "profiler")]
 use thread_profiler::{register_thread_with_profiler, write_profile};
-use utils::application_root_dir;
 use vergen;
 use winit::{Event, WindowEvent};
 
@@ -317,6 +317,7 @@ impl<'a, T, E: Send + Sync + Clone + 'static> Application<'a, T, E> {
 impl<'a, T, E: Send + Sync + 'static> Drop for Application<'a, T, E> {
     fn drop(&mut self) {
         // TODO: Specify filename in config.
+        use utils::application_root_dir;
         let path = format!("{}/thread_profile.json", application_root_dir());
         write_profile(path.as_str());
     }
@@ -440,6 +441,8 @@ impl<S, E: Send + Sync + 'static> ApplicationBuilder<S, E> {
         world.add_resource(FrameLimiter::default());
         world.add_resource(Stopwatch::default());
         world.add_resource(Time::default());
+
+        world.register::<Named>();
 
         Ok(ApplicationBuilder {
             initial_state,

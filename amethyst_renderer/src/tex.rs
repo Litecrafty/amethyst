@@ -160,7 +160,10 @@ where
         use gfx::Factory;
         use std::mem::size_of;
 
+        // This variable has to live here to make sure the flipped
+        // buffer lives long enough. (If one exists)
         let mut v_flip_buffer;
+        let mut data = self.data.as_ref();
         let (w, h, a, _) = self.info.kind.get_dimensions();
         let w = w as usize;
         let h = h as usize;
@@ -168,7 +171,6 @@ where
             0 => 1 as usize,
             _ => a as usize,
         };
-        let mut data = self.data.as_ref();
         let slice_len = data.len() / a;
         let mut arr = Vec::with_capacity(a);
 

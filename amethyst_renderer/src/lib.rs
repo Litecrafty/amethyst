@@ -97,7 +97,8 @@ pub use mesh::{vertex_data, Mesh, MeshBuilder, MeshHandle, VertexBuffer};
 pub use mtl::{Material, MaterialDefaults, MaterialTextureSet, TextureOffset};
 pub use pass::{
     get_camera, set_vertex_args, DrawFlat, DrawFlatSeparate, DrawPbm, DrawPbmSeparate, DrawShaded,
-    DrawShadedSeparate, DrawSprite,
+    DrawShadedSeparate, DrawSkyBox, DrawSprite,
+    SkyBox, load_cubemap,
 };
 pub use pipe::{
     ColorBuffer, Data, DepthBuffer, DepthMode, Effect, EffectBuilder, Init, Meta, NewEffect,

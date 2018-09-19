@@ -1,7 +1,7 @@
 use amethyst_assets::{AssetStorage, Loader};
 use amethyst_core::cgmath::{Matrix4, One, SquareMatrix};
-use amethyst_core::transform::GlobalTransform;
 use amethyst_core::specs::prelude::{Component, Join, Read, ReadExpect, ReadStorage, VecStorage};
+use amethyst_core::transform::GlobalTransform;
 
 use gfx::pso::buffer::{ElemStride, Element};
 use gfx::texture::Kind;
@@ -85,8 +85,7 @@ impl Pass for DrawSkyBox {
             .iter()
             .map(|v| PosOnly {
                 position: v.clone(),
-            })
-            .collect();
+            }).collect();
         self.mesh = Some(Mesh::build(data).build(&mut effect.factory)?);
         use std::mem;
         effect
@@ -96,8 +95,7 @@ impl Pass for DrawSkyBox {
                 "VertexArgs",
                 mem::size_of::<<VertexArgs as Uniform>::Std140>(),
                 1,
-            )
-            .with_texture("top")
+            ).with_texture("top")
             .with_output("color", None)
             .build()
     }
@@ -122,15 +120,14 @@ impl Pass for DrawSkyBox {
             .map(|&(ref cam, ref transform)| VertexArgs {
                 proj: cam.proj.into(),
                 view: transform.0.invert().unwrap().into(),
-            })
-            .unwrap_or_else(|| VertexArgs {
+            }).unwrap_or_else(|| VertexArgs {
                 proj: Matrix4::one().into(),
                 view: Matrix4::one().into(),
             });
 
         for sky in (&skybox).join() {
             let mesh = self.mesh.as_ref().unwrap();
-            
+
             //FIXME: it is probably not necessary to push the mesh to the GPU every frame. Loading
             //it once should be enough
             match mesh.buffer(PosOnly::ATTRIBUTES) {
@@ -140,7 +137,7 @@ impl Pass for DrawSkyBox {
                     return;
                 }
             }
-            
+
             effect.update_constant_buffer("VertexArgs", &vertex_args.std140(), encoder);
 
             //TODO: Related to the above comment, the skybox texture most likely doesnt change
@@ -214,8 +211,7 @@ fn load_texture<P: Into<String>>(path: P) -> ImageData {
                     image.to_rgba()
                 }
             }
-        })
-        .map(|rgba| ImageData { rgba })
+        }).map(|rgba| ImageData { rgba })
         .unwrap()
 }
 

@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 * GltfPrefab adds MeshData as a component on loaded entities. This is not configurable until the Prefab rework. ([#946])
 * Added implementation of From<Vector3<f32>> for Transform which creates a Transform using Vector3 as the translation vector. ([#946])
 * New vertices() method on MeshCreator trait. ([#946])
+* Support for text alignment (align left, center, right). ([#965])
+* Support for multiline text. ([#965])
 
 
 
@@ -60,6 +62,7 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 * Fix render gamma for most textures. ([#868])
 * Joint entities can only be part of a single skin: Materials are not swapped anymore. ([#933])
 * Fixed regression in sprite positioning after batching. ([#929])
+* Now loading default fonts from the system for UiButton ([#964])
 
 [#829]: https://github.com/amethyst/amethyst/issues/829
 [#830]: https://github.com/amethyst/amethyst/pull/830
@@ -85,6 +88,8 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 [#946]: https://github.com/amethyst/amethyst/pull/946
 [#950]: https://github.com/amethyst/amethyst/pull/950
 [#957]: https://github.com/amethyst/amethyst/pull/957
+[#964]: https://github.com/amethyst/amethyst/pull/964
+[#965]: https://github.com/amethyst/amethyst/pull/965
 [winit_017]: https://github.com/tomaka/winit/blob/master/CHANGELOG.md#version-0172-2018-08-19
 [glutin_018]: https://github.com/tomaka/glutin/blob/master/CHANGELOG.md#version-0180-2018-08-03
 

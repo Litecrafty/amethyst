@@ -18,6 +18,15 @@ use winit::{
     ElementState, Event, KeyboardInput, ModifiersState, MouseButton, VirtualKeyCode, WindowEvent,
 };
 
+/// How lines should behave when they are longer than the maximum line length.
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+pub enum LineMode {
+    /// Single line. It ignores line breaks.
+    Single,
+    /// Multiple lines. The text will automatically wrap when exceeding the maximum width.
+    Wrap,
+}
+
 /// A component used to display text in this entity's UiTransform
 #[derive(Clone, Derivative)]
 #[derivative(Debug)]
@@ -32,6 +41,10 @@ pub struct UiText {
     pub font: FontHandle,
     /// If true this will be rendered as dots instead of the text.
     pub password: bool,
+    /// How the text should handle new lines.
+    pub line_mode: LineMode,
+    /// How to align the text within its `UiTransform`.
+    pub align: Anchor,
     /// Cached FontHandle, used to detect changes to the font.
     pub(crate) cached_font: FontHandle,
     /// Cached glyph positions, used to process mouse highlighting
@@ -57,6 +70,8 @@ impl UiText {
             font_size,
             font: font.clone(),
             password: false,
+            line_mode: LineMode::Single,
+            align: Anchor::Middle,
             cached_font: font,
             cached_glyphs: Vec::new(),
             brush_id: None,
@@ -322,8 +337,7 @@ impl<'a> System<'a> for UiKeyboardSystem {
                                     } else {
                                         (i, (pos.x, pos.y))
                                     }
-                                })
-                                .0
+                                }).0
                                 as isize
                                 - focused_edit.cursor_position;
                             // The end of the text, while not a glyph, is still something
@@ -371,8 +385,7 @@ impl<'a> System<'a> for UiKeyboardSystem {
                                         && t.pixel_x + t.width / 2.0 >= self.mouse_position.0
                                         && t.pixel_y - t.height / 2.0 <= self.mouse_position.1
                                         && t.pixel_y + t.height / 2.0 >= self.mouse_position.1
-                                })
-                                .collect::<Vec<_>>();
+                                }).collect::<Vec<_>>();
                             // In instances of ambiguity we want to select the element with the
                             // highest Z order, so we need to find the highest Z order value among
                             // eligible elements.
@@ -407,10 +420,8 @@ impl<'a> System<'a> for UiKeyboardSystem {
                             {
                                 use std::f32::NAN;
 
-                                let mouse_x =
-                                    self.mouse_position.0;
-                                let mouse_y =
-                                    self.mouse_position.1;
+                                let mouse_x = self.mouse_position.0;
+                                let mouse_y = self.mouse_position.1;
                                 // Find the glyph closest to the click position.
                                 focused_edit.highlight_vector = 0;
                                 focused_edit.cursor_position = focused_text
@@ -422,15 +433,13 @@ impl<'a> System<'a> for UiKeyboardSystem {
                                         // Use Pythagorean theorem to compute distance
                                         if ((x - mouse_x).powi(2) + (y - mouse_y).powi(2)).sqrt()
                                             < ((pos.x - mouse_x).powi(2)
-                                                + (pos.y - mouse_y).powi(2))
-                                                .sqrt()
+                                                + (pos.y - mouse_y).powi(2)).sqrt()
                                         {
                                             (index, (x, y))
                                         } else {
                                             (i, (pos.x, pos.y))
                                         }
-                                    })
-                                    .0
+                                    }).0
                                     as isize;
                                 // The end of the text, while not a glyph, is still something
                                 // you'll likely want to click your cursor to, so if the cursor is
@@ -443,11 +452,10 @@ impl<'a> System<'a> for UiKeyboardSystem {
                                         focused_text.cached_glyphs.iter().last()
                                     {
                                         if (last_glyph.position().x - mouse_x).abs()
-                                            > ((last_glyph.position().x
-                                                + last_glyph
-                                                    .unpositioned()
-                                                    .h_metrics()
-                                                    .advance_width)
+                                            > ((last_glyph.position().x + last_glyph
+                                                .unpositioned()
+                                                .h_metrics()
+                                                .advance_width)
                                                 - mouse_x)
                                                 .abs()
                                         {

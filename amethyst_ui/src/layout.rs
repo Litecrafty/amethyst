@@ -5,6 +5,7 @@ use amethyst_core::specs::prelude::{
 };
 use amethyst_core::{HierarchyEvent, Parent, ParentHierarchy};
 use amethyst_renderer::ScreenDimensions;
+use gfx_glyph::{HorizontalAlign,VerticalAlign};
 
 /// Indicates if the position and margins should be calculated in pixel or
 /// relative to their parent size.
@@ -57,6 +58,36 @@ impl Anchor {
             Anchor::BottomRight => (0.5, -0.5),
         }
     }
+
+    /// Vertical align. Used by the ui `Pass`.
+    pub(crate) fn vertical_align(&self) -> VerticalAlign {
+        match self {
+            Anchor::TopLeft => VerticalAlign::Top,
+            Anchor::TopMiddle => VerticalAlign::Top,
+            Anchor::TopRight => VerticalAlign::Top,
+            Anchor::MiddleLeft => VerticalAlign::Center,
+            Anchor::Middle => VerticalAlign::Center,
+            Anchor::MiddleRight => VerticalAlign::Center,
+            Anchor::BottomLeft => VerticalAlign::Bottom,
+            Anchor::BottomMiddle => VerticalAlign::Bottom,
+            Anchor::BottomRight => VerticalAlign::Bottom,
+        }
+    }
+    
+    /// Horizontal align. Used by the ui `Pass`.
+    pub(crate) fn horizontal_align(&self) -> HorizontalAlign {
+        match self {
+            Anchor::TopLeft => HorizontalAlign::Left,
+            Anchor::TopMiddle => HorizontalAlign::Center,
+            Anchor::TopRight => HorizontalAlign::Right,
+            Anchor::MiddleLeft => HorizontalAlign::Left,
+            Anchor::Middle => HorizontalAlign::Center,
+            Anchor::MiddleRight => HorizontalAlign::Right,
+            Anchor::BottomLeft => HorizontalAlign::Left,
+            Anchor::BottomMiddle => HorizontalAlign::Center,
+            Anchor::BottomRight => HorizontalAlign::Right,
+        }
+     }
 }
 
 /// Indicates if a component should be stretched.
@@ -251,12 +282,8 @@ where
 
         let new_size = match transform.stretch {
             Stretch::NoStretch => (transform.width, transform.height),
-            Stretch::X { x_margin } => {
-                (screen_dim.width() - x_margin * 2.0, transform.height)
-            }
-            Stretch::Y { y_margin } => {
-                (transform.width, screen_dim.height() - y_margin * 2.0)
-            }
+            Stretch::X { x_margin } => (screen_dim.width() - x_margin * 2.0, transform.height),
+            Stretch::Y { y_margin } => (transform.width, screen_dim.height() - y_margin * 2.0),
             Stretch::XY { x_margin, y_margin } => (
                 screen_dim.width() - x_margin * 2.0,
                 screen_dim.height() - y_margin * 2.0,

@@ -18,8 +18,8 @@ use gfx::preset::blend;
 use gfx::pso::buffer::ElemStride;
 use gfx::state::ColorMask;
 use gfx_glyph::{
-    BuiltInLineBreaker, FontId, GlyphBrush, GlyphBrushBuilder, GlyphCruncher, HorizontalAlign,
-    Layout, Point, Scale, SectionText, VariedSection, VerticalAlign,
+    BuiltInLineBreaker, FontId, GlyphBrush, GlyphBrushBuilder, GlyphCruncher,
+    Layout, Point, Scale, SectionText, VariedSection,
 };
 use glsl_layout::{vec2, Uniform};
 use hibitset::BitSet;
@@ -122,8 +122,7 @@ impl Pass for DrawUi {
                 "VertexArgs",
                 mem::size_of::<<VertexArgs as Uniform>::Std140>(),
                 1,
-            )
-            .with_raw_vertex_buffer(PosTex::ATTRIBUTES, PosTex::size() as ElemStride, 0)
+            ).with_raw_vertex_buffer(PosTex::ATTRIBUTES, PosTex::size() as ElemStride, 0)
             .with_texture("albedo")
             .with_blended_output("color", ColorMask::all(), blend::ALPHA, None)
             .build()
@@ -224,10 +223,7 @@ impl Pass for DrawUi {
                 let vertex_args = VertexArgs {
                     invert_window_size: invert_window_size.into(),
                     // Coordinates are middle centered. It makes it easier to do layouting in most cases.
-                    coord: [
-                        ui_transform.pixel_x,
-                        ui_transform.pixel_y,
-                    ].into(),
+                    coord: [ui_transform.pixel_x, ui_transform.pixel_y].into(),
                     dimension: [ui_transform.pixel_width, ui_transform.pixel_height].into(),
                 };
 
@@ -293,8 +289,7 @@ impl Pass for DrawUi {
                             .map(|i| i.0)
                             .unwrap_or(rendered_string.len());
                         start_byte.map(|start_byte| (editing, (start_byte, end_byte)))
-                    })
-                    .map(|(editing, (start_byte, end_byte))| {
+                    }).map(|(editing, (start_byte, end_byte))| {
                         vec![
                             SectionText {
                                 text: &((rendered_string)[0..start_byte]),
@@ -315,31 +310,35 @@ impl Pass for DrawUi {
                                 font_id: FontId(0),
                             },
                         ]
-                    })
-                    .unwrap_or(vec![SectionText {
+                    }).unwrap_or(vec![SectionText {
                         text: rendered_string,
                         scale: scale,
                         color: ui_text.color,
                         font_id: FontId(0),
                     }]);
-                // TODO: If you're adding multi-line support you need to change this to use
-                // Layout::Wrap.
-                let layout = Layout::SingleLine {
-                    line_breaker: BuiltInLineBreaker::UnicodeLineBreaker,
-                    h_align: HorizontalAlign::Left,
-                    v_align: VerticalAlign::Top,
+
+                let layout = match ui_text.line_mode {
+                    LineMode::Single => Layout::SingleLine {
+                        line_breaker: BuiltInLineBreaker::UnicodeLineBreaker,
+                        h_align: ui_text.align.horizontal_align(),
+                        v_align: ui_text.align.vertical_align(),
+                    },
+                    LineMode::Wrap => Layout::Wrap {
+                        line_breaker: BuiltInLineBreaker::UnicodeLineBreaker,
+                        h_align: ui_text.align.horizontal_align(),
+                        v_align: ui_text.align.vertical_align(),
+                    },
                 };
 
                 let section = VariedSection {
                     // Needs a recenter because we are using [-0.5,0.5] for the mesh
                     // instead of the expected [0,1]
                     screen_position: (
-                        (ui_transform.pixel_x - ui_transform.pixel_width / 2.0) * hidpi,
+                        (ui_transform.pixel_x + ui_transform.pixel_width * ui_text.align.norm_offset().0) * hidpi,
                         // invert y because gfx-glyph inverts it back
-                        (screen_dimensions.height() - ui_transform.pixel_y - ui_transform.pixel_height / 2.0) * hidpi,
+                        (screen_dimensions.height() - ui_transform.pixel_y - ui_transform.pixel_height * ui_text.align.norm_offset().1) * hidpi,
                     ),
                     bounds: (ui_transform.pixel_width, ui_transform.pixel_height),
-                    // TODO
                     // Invert z because of gfx-glyph using z+ forward
                     z: ui_transform.global_z / highest_abs_z,
                     layout,
@@ -406,7 +405,11 @@ impl Pass for DrawUi {
                         let vertex_args = VertexArgs {
                             invert_window_size: invert_window_size.into(),
                             // gfx-glyph uses y down so we need to convert to y up
-                            coord: [pos.x + width / 2.0, screen_dimensions.height() - pos.y + ascent / 2.0].into(),
+                            coord: [
+                                pos.x + width / 2.0,
+                                screen_dimensions.height() - pos.y + ascent / 2.0,
+                            ]
+                                .into(),
                             dimension: [width, height].into(),
                         };
                         effect.update_constant_buffer("VertexArgs", &vertex_args.std140(), encoder);
@@ -433,8 +436,7 @@ impl Pass for DrawUi {
                                 ui_text.color,
                                 &loader,
                                 &tex_storage,
-                            ))
-                            .map(|tex| (tex, ed))
+                            )).map(|tex| (tex, ed))
                     }) {
                         let blink_on = editing.cursor_blink_timer < 0.5 / CURSOR_BLINK_RATE;
                         if editing.use_block_cursor || blink_on {
@@ -483,11 +485,13 @@ impl Pass for DrawUi {
                                 width = 2.0;
                             }
                             
-                            let pos = glyph.map(|g| g.position()).unwrap_or(Point {
-                                x: ui_transform.pixel_x - ui_transform.width / 2.,
-                                // gfx-glyph uses y down so we need to convert to y up
-                                y: screen_dimensions.height() - ui_transform.pixel_y + ascent / 2.0,
+                            let mut pos = glyph.map(|g| g.position()).unwrap_or(Point {
+                                x: ui_transform.pixel_x + ui_transform.width * ui_text.align.norm_offset().0,
+                                y: 0.0,
                             });
+                            // gfx-glyph uses y down so we need to convert to y up
+                            pos.y = screen_dimensions.height() - ui_transform.pixel_y + ascent / 2.0;
+
                             let mut x = pos.x / hidpi;
                             if let Some(glyph) = glyph {
                                 if at_end {
@@ -548,6 +552,5 @@ fn cached_color_texture(
             };
             let texture_data = TextureData::Rgba(color, meta);
             loader.load_from_data(texture_data, (), storage)
-        })
-        .clone()
+        }).clone()
 }

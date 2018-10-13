@@ -44,6 +44,7 @@ pub struct TextureMetadata {
     /// (which represents a value between `0.0` and `1.0`).
     pub channel: ChannelType,
     /// Texture kind
+    #[serde(default = "serde_helper::default_kind")]
     pub kind: Kind,
 }
 
@@ -58,7 +59,7 @@ impl TextureMetadata {
             format: SurfaceFormat::get_surface_type(),
             size: None,
             channel: ChannelType::Unorm,
-            kind: Kind::D2(1, 1, AaMode::Single),
+            kind: serde_helper::default_kind(),
         }
     }
 
@@ -461,13 +462,21 @@ where
     D: AsRef<[T]>,
     T: Pod + Copy,
 {
-    tb
-        .with_sampler(metadata.sampler)
-        .mip_levels(metadata.mip_levels)
-        .dynamic(metadata.dynamic)
-        .with_format(metadata.format)
-        .with_channel_type(metadata.channel)
-        .with_kind(metadata.kind)
+    match metadata.size {
+        Some((w, h)) => tb
+            .with_sampler(metadata.sampler)
+            .mip_levels(metadata.mip_levels)
+            .dynamic(metadata.dynamic)
+            .with_format(metadata.format)
+            .with_channel_type(metadata.channel)
+            .with_size(w, h),
+        None => tb
+            .with_sampler(metadata.sampler)
+            .mip_levels(metadata.mip_levels)
+            .dynamic(metadata.dynamic)
+            .with_format(metadata.format)
+            .with_channel_type(metadata.channel),
+    }
 }
 
 fn create_texture_asset_from_image(
@@ -564,6 +573,7 @@ impl SimpleFormat<Texture> for TextureFormat {
 mod serde_helper {
     use super::SamplerInfo;
     use tex::{FilterMethod, WrapMode};
+    use gfx::texture::{AaMode, Kind};
 
     fn default_filter() -> FilterMethod {
         FilterMethod::Trilinear
@@ -571,6 +581,10 @@ mod serde_helper {
 
     fn default_wrap() -> WrapMode {
         WrapMode::Clamp
+    }
+
+    pub fn default_kind() -> Kind {
+        Kind::D2(1, 1, AaMode::Single)
     }
 
     pub fn default_sampler() -> SamplerInfo {

@@ -1,5 +1,8 @@
 //! Texture resource.
 
+pub use gfx::format::{ChannelType, SurfaceType};
+pub use gfx::texture::{FilterMethod, SamplerInfo, WrapMode};
+
 use amethyst_assets::{Asset, Handle};
 use amethyst_core::specs::prelude::DenseVecStorage;
 use error::Result;

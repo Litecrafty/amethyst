@@ -178,15 +178,7 @@ where
         load_texture(names[4]),
         load_texture(names[5]),
     ];
-    let meta = TextureMetadata {
-        sampler: None,
-        mip_levels: None,
-        size: None,
-        dynamic: false,
-        format: None,
-        channel: None,
-        kind: Some(Kind::Cube(size)),
-    };
+    let meta = TextureMetadata::srgb().with_kind(Kind::Cube(size));
 
     let texture_data = TextureData::CubeImage(data, meta);
     loader.load_from_data(texture_data, (), storage)

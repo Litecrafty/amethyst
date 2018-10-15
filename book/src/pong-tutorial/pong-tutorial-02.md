@@ -62,7 +62,7 @@ We will leave it empty for now, but it will become useful later down the line.
 # extern crate amethyst;
 # use amethyst::prelude::*;
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a,'b> for MyState {
+# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
 fn on_start(&mut self, data: StateData<GameData>) {
 
 }
@@ -140,7 +140,7 @@ To finish setting up the camera, let's call it in our State's `on_start` method:
 # use amethyst::ecs::World;
 # fn initialise_camera(world: &mut World) { }
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a,'b> for MyState {
+# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
 fn on_start(&mut self, data: StateData<GameData>) {
     let world = data.world;
 
@@ -298,7 +298,7 @@ compiles. Update the `on_start` method to the following:
 # fn initialise_paddles(world: &mut World) { }
 # fn initialise_camera(world: &mut World) { }
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a,'b> for MyState {
+# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
 fn on_start(&mut self, data: StateData<GameData>) {
     let world = data.world;
 
@@ -388,7 +388,7 @@ the pattern and add the `TransformBundle`.
 #       .with_pass(DrawSprite::new()),
 # );
 # struct Pong;
-# impl<'a, 'b> SimpleState<'a,'b> for Pong { }
+# impl<'a, 'b> SimpleState<'a, 'b> for Pong { }
 let game_data = GameDataBuilder::default()
     .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
     .with_bundle(TransformBundle::new())?;
@@ -441,7 +441,7 @@ fn load_sprite_sheet(world: &mut World) -> SpriteSheetHandle {
         loader.load(
             "texture/pong_spritesheet.png",
             PngFormat,
-            TextureMetadata::srgb(),
+            TextureMetadata::srgb_scale(),
             (),
             &texture_storage,
         )
@@ -486,7 +486,7 @@ Heading back to the code, we need to add this snippet after loading the texture.
 #       loader.load(
 #           "texture/pong_spritesheet.png",
 #           PngFormat,
-#           TextureMetadata::srgb(),
+#           TextureMetadata::srgb_scale(),
 #           (),
 #           &texture_storage,
 #       )
@@ -526,7 +526,7 @@ sprite sheet. Behold, texture coordinates!
 #       loader.load(
 #           "texture/pong_spritesheet.png",
 #           PngFormat,
-#           TextureMetadata::srgb(),
+#           TextureMetadata::srgb_scale(),
 #           (),
 #           &texture_storage,
 #       )
@@ -656,7 +656,7 @@ Next we simply add the components to the paddle entities:
 #   sprite_number: 0,
 #   flip_horizontal: true,
 #   flip_vertical: false,
-# }; 
+# };
 // Create a left plank entity.
 world
     .create_entity()
@@ -689,7 +689,7 @@ all together in the `on_start()` method:
 # fn initialise_camera(world: &mut World) { }
 # fn load_sprite_sheet(world: &mut World) -> SpriteSheetHandle { unimplemented!() }
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a,'b> for MyState {
+# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
 fn on_start(&mut self, data: StateData<GameData>) {
     let world = data.world;
 

@@ -74,6 +74,17 @@ impl TextureMetadata {
         }
     }
 
+    /// Creates texture metadata for `Srgb` texture but without texture filtering. This is usually
+    /// the case for color textures for 2D sprites and pixel art textures.
+    ///
+    /// For the values of all the other fields please refer to the documentation of the respective
+    /// field.
+    ///
+    /// Wrap mode is set to `WrapMode::Clamp` by default.
+    pub fn srgb_scale() -> Self {
+        TextureMetadata::srgb().with_filter(FilterMethod::Scale)
+    }
+
     /// Sampler info
     pub fn with_sampler(mut self, info: SamplerInfo) -> Self {
         self.sampler = info;
@@ -237,13 +248,7 @@ where
                     .load_from_data(data.clone(), (), &system_data.1)
             }
 
-            TexturePrefab::File(ref name, ref format, ref options) => system_data.0.load(
-                name.as_ref(),
-                format.clone(),
-                options.clone(),
-                (),
-                &system_data.1,
-            ),
+            TexturePrefab::File(..) => unreachable!(),
 
             TexturePrefab::Handle(ref handle) => handle.clone(),
         };
@@ -454,24 +459,19 @@ pub fn create_texture_asset(
     t.map(|t| ProcessingState::Loaded(t))
 }
 
-fn apply_options<D, T>(
-    tb: TextureBuilder<D, T>,
-    metadata: TextureMetadata,
-) -> TextureBuilder<D, T>
+fn apply_options<D, T>(tb: TextureBuilder<D, T>, metadata: TextureMetadata) -> TextureBuilder<D, T>
 where
     D: AsRef<[T]>,
     T: Pod + Copy,
 {
     match metadata.size {
-        Some((w, h)) => tb
-            .with_sampler(metadata.sampler)
+        Some((w, h)) => tb.with_sampler(metadata.sampler)
             .mip_levels(metadata.mip_levels)
             .dynamic(metadata.dynamic)
             .with_format(metadata.format)
             .with_channel_type(metadata.channel)
             .with_size(w, h),
-        None => tb
-            .with_sampler(metadata.sampler)
+        None => tb.with_sampler(metadata.sampler)
             .mip_levels(metadata.mip_levels)
             .dynamic(metadata.dynamic)
             .with_format(metadata.format)

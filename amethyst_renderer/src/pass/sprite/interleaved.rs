@@ -82,11 +82,7 @@ impl Pass for DrawSprite {
                 "ViewArgs",
                 mem::size_of::<<ViewArgs as Uniform>::Std140>(),
                 1,
-            ).with_raw_vertex_buffer(
-                Self::attributes(),
-                SpriteInstance::size() as ElemStride,
-                1,
-            );
+            ).with_raw_vertex_buffer(Self::attributes(), SpriteInstance::size() as ElemStride, 1);
         setup_textures(&mut builder, &TEXTURES);
         match self.transparency {
             Some((mask, blend, depth)) => builder.with_blended_output("color", mask, blend, depth),
@@ -229,7 +225,7 @@ impl SpriteBatch {
         self.sprites.push(SpriteDrawData {
             texture: texture_handle,
             render: sprite_render.clone(),
-            transform: global.unwrap().clone(),
+            transform: *global.unwrap(),
         });
     }
 

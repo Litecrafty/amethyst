@@ -94,7 +94,7 @@ where
         use gfx::memory::Usage;
 
         TextureBuilder {
-            data: data,
+            data,
             info: Info {
                 kind: Kind::D2(1, 1, AaMode::Single),
                 levels: 1,
@@ -217,9 +217,9 @@ where
         let sampler = fac.create_sampler(self.sampler);
 
         Ok(Texture {
-            sampler: sampler,
+            sampler,
             texture: tex,
-            view: view,
+            view,
         })
     }
 }

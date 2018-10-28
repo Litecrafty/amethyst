@@ -69,10 +69,10 @@ impl<'a> System<'a> for VisibilitySortingSystem {
             .or_else(|| (&camera, &global).join().map(|cg| cg.1).next());
         let camera_backward = camera
             .map(|c| c.0.z.truncate())
-            .unwrap_or(Vector3::unit_z());
+            .unwrap_or_else(Vector3::unit_z);
         let camera_centroid = camera
             .map(|g| g.0.transform_point(origin))
-            .unwrap_or(origin.clone());
+            .unwrap_or(origin);
 
         self.centroids.clear();
         self.centroids.extend(
@@ -85,8 +85,7 @@ impl<'a> System<'a> for VisibilitySortingSystem {
                     centroid,
                     camera_distance: centroid.distance2(camera_centroid),
                     from_camera: centroid - camera_centroid,
-                })
-                .filter(|c| c.from_camera.dot(camera_backward) < 0.), // filter entities behind the camera
+                }).filter(|c| c.from_camera.dot(camera_backward) < 0.), // filter entities behind the camera
         );
         self.transparent.clear();
         self.transparent

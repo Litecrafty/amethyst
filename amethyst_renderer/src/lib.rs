@@ -109,6 +109,7 @@ pub use {
     pass::{
         get_camera, set_vertex_args, DebugLinesParams, DrawDebugLines, DrawFlat, DrawFlatSeparate,
         DrawPbm, DrawPbmSeparate, DrawShaded, DrawShadedSeparate, DrawSprite,
+        DrawSkyBox, SkyBox, load_cubemap,
     },
     pipe::{
         ColorBuffer, Data, DepthBuffer, DepthMode, Effect, EffectBuilder, Init, Meta, NewEffect,

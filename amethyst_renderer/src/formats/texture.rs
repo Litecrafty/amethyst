@@ -2,7 +2,7 @@ use std::result::Result as StdResult;
 
 use gfx::{
     format::{ChannelType, SurfaceType, SurfaceTyped},
-    texture::{AaMode, Kind, SamplerInfo};
+    texture::{Kind, SamplerInfo},
     traits::Pod,
 };
 use image::{DynamicImage, ImageFormat, RgbaImage};

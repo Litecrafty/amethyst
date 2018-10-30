@@ -2,11 +2,12 @@
 //!
 //! TODO: Remove redundant padding once `#[repr(align(...))]` stabilizes.
 
+use gfx;
+
 use amethyst_assets::{PrefabData, PrefabError, ProgressCounter};
 use amethyst_core::specs::prelude::{Component, DenseVecStorage, Entity, WriteStorage};
-use color::Rgba;
-use gfx;
-use resources::AmbientColor;
+
+use {color::Rgba, resources::AmbientColor};
 
 /// A light source.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, PrefabData)]
@@ -112,16 +113,14 @@ impl From<PointLight> for Light {
 pub struct SpotLight {
     /// Opening angle of the light cone in degrees.
     pub angle: f32, //TODO: Replace with a cgmath type when gfx version > 0.16
-    /// Location of the light source in three dimensional space.
-    pub center: [f32; 3], //TODO: Replace with a cgmath type when gfx version > 0.16
     /// Color of the light in RGBA8 format.
     pub color: Rgba,
     /// Direction that the light is pointing.
     pub direction: [f32; 3], //TODO: Replace with a cgmath type when gfx version > 0.16
     /// Brightness of the light source, in lumens.
     pub intensity: f32,
-    /// Maximum radius of the point light's affected area.
-    pub radius: f32,
+    /// Range/length of the light source.
+    pub range: f32,
     /// Smoothness of the light-to-dark transition from the center to the
     /// radius.
     pub smoothness: f32,
@@ -131,11 +130,10 @@ impl Default for SpotLight {
     fn default() -> Self {
         SpotLight {
             angle: 60.0,
-            center: [0.0, 1.0, 0.0],
             color: Rgba::default(),
             direction: [0.0, -1.0, 0.0],
             intensity: 10.0,
-            radius: 10.0,
+            range: 10.0,
             smoothness: 4.0,
         }
     }

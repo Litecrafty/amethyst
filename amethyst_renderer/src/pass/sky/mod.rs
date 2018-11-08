@@ -19,8 +19,8 @@ use tex::{Texture, TextureHandle};
 use types::{Encoder, Factory};
 use vertex::{Attribute, AttributeFormat, Attributes, Position, VertexFormat, With};
 
-const VERT_SRC: &[u8] = include_bytes!("../shaders/vertex/skybox.glsl");
-const FRAG_SRC: &[u8] = include_bytes!("../shaders/fragment/skybox.glsl");
+const VERT_SRC: &[u8] = include_bytes!("../shaders/vertex/sky.glsl");
+const FRAG_SRC: &[u8] = include_bytes!("../shaders/fragment/sky.glsl");
 
 #[repr(C, align(16))]
 #[derive(Clone, Copy, Debug, Uniform)]

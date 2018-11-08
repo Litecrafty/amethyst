@@ -108,7 +108,8 @@ pub use {
     mtl::{Material, MaterialDefaults, MaterialTextureSet, TextureOffset},
     pass::{
         get_camera, set_vertex_args, DebugLinesParams, DrawDebugLines, DrawFlat, DrawFlatSeparate,
-        DrawPbm, DrawPbmSeparate, DrawShaded, DrawShadedSeparate, DrawSprite,
+        DrawPbm, DrawPbmSeparate, DrawShaded, DrawShadedSeparate, DrawSkybox, DrawSprite,
+        SkyboxColor,
         DrawSkyBox, SkyBox, load_cubemap,
     },
     pipe::{
@@ -124,8 +125,7 @@ pub use {
         JointTransformsPrefab, JointWeights,
     },
     sprite::{
-        Sprite, SpriteRender, SpriteSheet, SpriteSheetFormat, SpriteSheetHandle, SpriteSheetSet,
-        TextureCoordinates,
+        Sprite, SpriteRender, SpriteSheet, SpriteSheetFormat, SpriteSheetHandle, TextureCoordinates,
     },
     sprite_visibility::{SpriteVisibility, SpriteVisibilitySortingSystem},
     system::RenderSystem,

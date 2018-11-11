@@ -1,7 +1,9 @@
 use amethyst_assets::{AssetStorage, Loader};
-use amethyst_core::cgmath::{Matrix4, One, SquareMatrix};
-use amethyst_core::specs::prelude::{Component, Join, Read, ReadExpect, ReadStorage, VecStorage};
-use amethyst_core::transform::GlobalTransform;
+use amethyst_core::{
+    nalgebra as na,
+    specs::prelude::{Component, Join, Read, ReadExpect, ReadStorage, VecStorage},
+    transform::GlobalTransform,
+};
 
 use gfx::pso::buffer::{ElemStride, Element};
 use gfx::texture::Kind;
@@ -117,12 +119,20 @@ impl Pass for DrawSkyBox {
         let camera = get_camera(active, &camera, &global);
         let vertex_args = camera
             .as_ref()
-            .map(|&(ref cam, ref transform)| VertexArgs {
-                proj: cam.proj.into(),
-                view: transform.0.invert().unwrap().into(),
-            }).unwrap_or_else(|| VertexArgs {
-                proj: Matrix4::one().into(),
-                view: Matrix4::one().into(),
+            .map(|&(ref cam, ref transform)| {
+                let proj: [[f32; 4]; 4] = cam.proj.into();
+                let view: [[f32; 4]; 4] = transform.0.try_inverse().unwrap().into();
+                VertexArgs {
+                    proj: proj.into(),
+                    view: view.into(),
+                }
+            }).unwrap_or_else(|| {
+                let proj: [[f32; 4]; 4] = na::Matrix4::identity().into();
+                let view: [[f32; 4]; 4] = na::Matrix4::identity().into();
+                VertexArgs {
+                    proj: proj.into(),
+                    view: view.into(),
+                }
             });
 
         for sky in (&skybox).join() {

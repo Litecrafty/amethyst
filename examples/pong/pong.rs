@@ -4,8 +4,8 @@ use amethyst::{
     ecs::prelude::World,
     prelude::*,
     renderer::{
-        Camera, MaterialTextureSet, PngFormat, Projection, SpriteRender, SpriteSheet,
-        SpriteSheetFormat, SpriteSheetHandle, Texture, TextureMetadata,
+        Camera, Flipped, PngFormat, Projection, SpriteRender, SpriteSheet, SpriteSheetFormat,
+        SpriteSheetHandle, Texture, TextureMetadata,
     },
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
@@ -51,18 +51,12 @@ fn load_sprite_sheet(world: &mut World) -> SpriteSheetHandle {
         )
     };
 
-    // `texture_id` is a application defined ID given to the texture to store in the `World`.
-    // This is needed to link the texture to the sprite_sheet.
-    let texture_id = 0;
-    let mut material_texture_set = world.write_resource::<MaterialTextureSet>();
-    material_texture_set.insert(texture_id, texture_handle);
-
     let loader = world.read_resource::<Loader>();
     let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
     loader.load(
         "texture/pong_spritesheet.ron", // Here we load the associated ron file
         SpriteSheetFormat,
-        texture_id, // We pass it the ID of the texture we want it to use
+        texture_handle, // We pass it the texture we want it to use
         (),
         &sprite_sheet_store,
     )
@@ -96,24 +90,15 @@ fn initialise_paddles(world: &mut World, sprite_sheet_handle: SpriteSheetHandle)
     right_transform.set_xyz(ARENA_WIDTH - PADDLE_WIDTH * 0.5, y, 0.0);
 
     // Assign the sprites for the paddles
-    let sprite_render_left = SpriteRender {
+    let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 0, // paddle is the first sprite in the sprite_sheet
-        flip_horizontal: false,
-        flip_vertical: false,
-    };
-
-    let sprite_render_right = SpriteRender {
-        sprite_sheet: sprite_sheet_handle,
-        sprite_number: 0,
-        flip_horizontal: true,
-        flip_vertical: false,
     };
 
     // Create a left plank entity.
     world
         .create_entity()
-        .with(sprite_render_left)
+        .with(sprite_render.clone())
         .with(Paddle {
             side: Side::Left,
             width: PADDLE_WIDTH,
@@ -125,7 +110,8 @@ fn initialise_paddles(world: &mut World, sprite_sheet_handle: SpriteSheetHandle)
     // Create right plank entity.
     world
         .create_entity()
-        .with(sprite_render_right)
+        .with(sprite_render.clone())
+        .with(Flipped::Horizontal)
         .with(Paddle {
             side: Side::Right,
             width: PADDLE_WIDTH,
@@ -147,8 +133,6 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: SpriteSheetHandle) {
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle,
         sprite_number: 1, // ball is the second sprite on the sprite_sheet
-        flip_horizontal: false,
-        flip_vertical: false,
     };
 
     world

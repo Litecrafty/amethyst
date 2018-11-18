@@ -21,9 +21,9 @@ use amethyst::{
     input::{get_key, is_close_requested, is_key_down},
     prelude::*,
     renderer::{
-        Camera, ColorMask, DepthMode, DisplayConfig, DrawSprite, ElementState, Hidden,
-        MaterialTextureSet, Pipeline, Projection, RenderBundle, ScreenDimensions, SpriteRender,
-        SpriteSheet, SpriteSheetHandle, Stage, Transparent, VirtualKeyCode, ALPHA,
+        Camera, ColorMask, DepthMode, DisplayConfig, DrawFlat2D, ElementState, Hidden, Pipeline,
+        Projection, RenderBundle, ScreenDimensions, SpriteRender, SpriteSheet, SpriteSheetHandle,
+        Stage, Transparent, VirtualKeyCode, ALPHA,
     },
     utils::application_root_dir,
 };
@@ -290,8 +290,6 @@ impl Example {
             let sprite_render = SpriteRender {
                 sprite_sheet: sprite_sheet_handle.clone(),
                 sprite_number: i,
-                flip_horizontal: false,
-                flip_vertical: false,
             };
 
             let mut entity_builder = world
@@ -323,20 +321,12 @@ impl Example {
 /// * texture: the pixel data
 /// * `SpriteSheet`: the layout information of the sprites on the image
 fn load_sprite_sheet(world: &mut World) -> LoadedSpriteSheet {
-    let sprite_sheet_index = 0;
-
-    // Store texture in the world's `MaterialTextureSet` resource (singleton hash map)
-    // This is used by the `DrawSprite` pass to look up the texture from the `SpriteSheet`
     let texture = png_loader::load("texture/bat_semi_transparent.png", world);
-    world
-        .write_resource::<MaterialTextureSet>()
-        .insert(sprite_sheet_index, texture);
-
     let sprite_w = 32.;
     let sprite_h = 32.;
     let sprite_sheet_definition = SpriteSheetDefinition::new(sprite_w, sprite_h, 2, 6, false);
 
-    let sprite_sheet = sprite_sheet_loader::load(sprite_sheet_index, &sprite_sheet_definition);
+    let sprite_sheet = sprite_sheet_loader::load(texture, &sprite_sheet_definition);
     let sprite_count = sprite_sheet.sprites.len();
 
     let sprite_sheet_handle = {
@@ -369,7 +359,7 @@ fn main() -> amethyst::Result<()> {
     let pipe = Pipeline::build().with_stage(
         Stage::with_backbuffer()
             .clear_target([0., 0., 0., 1.], 5.)
-            .with_pass(DrawSprite::new().with_transparency(
+            .with_pass(DrawFlat2D::new().with_transparency(
                 ColorMask::all(),
                 ALPHA,
                 Some(DepthMode::LessEqualWrite),

@@ -575,8 +575,8 @@ impl SimpleFormat<Texture> for TextureFormat {
 }
 
 mod serde_helper {
-    use tex::{FilterMethod, WrapMode};
-    use gfx::texture::{AaMode, Kind};
+    use crate::tex::{FilterMethod, WrapMode};
+    use crate::gfx::texture::{AaMode, Kind};
 
     use super::SamplerInfo;
 

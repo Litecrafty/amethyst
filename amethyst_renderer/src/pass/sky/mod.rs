@@ -9,17 +9,17 @@ use gfx::pso::buffer::{ElemStride, Element};
 use gfx::texture::Kind;
 use glsl_layout::*;
 
-use cam::{ActiveCamera, Camera};
-use error::Result;
-use formats::{ImageData, TextureData, TextureMetadata};
-use mesh::Mesh;
-use mtl::MaterialDefaults;
-use pass::util::get_camera;
-use pipe::pass::{Pass, PassData};
-use pipe::{Effect, NewEffect};
-use tex::{Texture, TextureHandle};
-use types::{Encoder, Factory};
-use vertex::{Attribute, AttributeFormat, Attributes, Position, VertexFormat, With};
+use crate::cam::{ActiveCamera, Camera};
+use crate::error::Result;
+use crate::formats::{ImageData, TextureData, TextureMetadata};
+use crate::mesh::Mesh;
+use crate::mtl::MaterialDefaults;
+use crate::pass::util::get_camera;
+use crate::pipe::pass::{Pass, PassData};
+use crate::pipe::{Effect, NewEffect};
+use crate::tex::{Texture, TextureHandle};
+use crate::types::{Encoder, Factory};
+use crate::vertex::{Attribute, AttributeFormat, Attributes, Position, VertexFormat, With};
 
 const VERT_SRC: &[u8] = include_bytes!("../shaders/vertex/sky.glsl");
 const FRAG_SRC: &[u8] = include_bytes!("../shaders/fragment/sky.glsl");
@@ -82,7 +82,7 @@ impl<'a> PassData<'a> for DrawSkyBox {
 }
 
 impl Pass for DrawSkyBox {
-    fn compile(&mut self, mut effect: NewEffect) -> Result<Effect> {
+    fn compile(&mut self, mut effect: NewEffect<'_>) -> Result<Effect> {
         let data: Vec<PosOnly> = SKYBOX_VERTICES
             .iter()
             .map(|v| PosOnly {

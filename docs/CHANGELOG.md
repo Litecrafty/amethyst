@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 
 ### Added
 
+* Partially migrate the project to Rust 2018.  Full migration will be completed at some point after 2019-01-31 ([#1098])
+* `SystemExt::pausable` for better ergonomics when pausing systems for specific states ([#1146]).
 * `amethyst_test` test framework for ergonomic testing of Amethyst applications ([#1000])
 * combinations of buttons triggering actions ([#1043])
 * `UiPrefab` field `hidden: bool` to hide entities ([#1051])
@@ -37,6 +39,7 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 * Updated `winit` to `0.18` (see [Winit's changelog][winit_018]). ([#1131])
 * Updated `glutin` to `0.19` (see [Glutin's changelog][glutin_019]). ([#1131])
 * Renamed the `DrawSprite` pass to `DrawFlat2D` as it now handles both sprites and images without spritesheets. ([#1153])
+* `BasicScenePrefab` deserialization now returns an error on invalid fields. ([#1164])
 
 ### Removed
 
@@ -47,6 +50,8 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 
 ### Fixed
 
+[#1146]: https://github.com/amethyst/amethyst/pull/1146
+[#1144]: https://github.com/amethyst/amethyst/pull/1144
 [#1000]: https://github.com/amethyst/amethyst/pull/1000
 [#1043]: https://github.com/amethyst/amethyst/pull/1043
 [#1051]: https://github.com/amethyst/amethyst/pull/1051
@@ -57,6 +62,7 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 [#1090]: https://github.com/amethyst/amethyst/pull/1090
 [#1112]: https://github.com/amethyst/amethyst/pull/1112
 [#1089]: https://github.com/amethyst/amethyst/pull/1089
+[#1098]: https://github.com/amethyst/amethyst/pull/1098
 [#1099]: https://github.com/amethyst/amethyst/pull/1099
 [#1108]: https://github.com/amethyst/amethyst/pull/1108
 [#1125]: https://github.com/amethyst/amethyst/pull/1125
@@ -66,6 +72,7 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 [#1129]: https://github.com/amethyst/amethyst/pull/1129
 [#1131]: https://github.com/amethyst/amethyst/pull/1131
 [#1153]: https://github.com/amethyst/amethyst/pull/1153
+[#1164]: https://github.com/amethyst/amethyst/pull/1164
 [winit_018]: https://github.com/tomaka/winit/blob/v0.18.0/CHANGELOG.md#version-0180-2018-11-07
 [glutin_019]: https://github.com/tomaka/glutin/blob/master/CHANGELOG.md#version-0190-2018-11-09
 

@@ -13,7 +13,7 @@ use amethyst_assets::{
 };
 use amethyst_core::specs::prelude::{Entity, Read, ReadExpect};
 
-use {
+use crate::{
     tex::{FilterMethod, Texture, TextureBuilder},
     types::SurfaceFormat,
     Renderer,
@@ -378,6 +378,7 @@ impl SimpleFormat<Texture> for BmpFormat {
 }
 
 /// Allows loading of TGA files.
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct TgaFormat;
 
 impl TgaFormat {
@@ -469,18 +470,16 @@ where
     D: AsRef<[T]>,
     T: Pod + Copy,
 {
-    match metadata.size {
-        Some((w, h)) => tb.with_sampler(metadata.sampler)
-            .mip_levels(metadata.mip_levels)
-            .dynamic(metadata.dynamic)
-            .with_format(metadata.format)
-            .with_channel_type(metadata.channel)
-            .with_size(w, h),
-        None => tb.with_sampler(metadata.sampler)
-            .mip_levels(metadata.mip_levels)
-            .dynamic(metadata.dynamic)
-            .with_format(metadata.format)
-            .with_channel_type(metadata.channel),
+    let builder = tb
+        .with_sampler(metadata.sampler)
+        .mip_levels(metadata.mip_levels)
+        .dynamic(metadata.dynamic)
+        .with_format(metadata.format)
+        .with_channel_type(metadata.channel);
+    if let Some((x, y)) = metadata.size {
+        builder.with_size(x, y)
+    } else {
+        builder
     }
 }
 

@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 
 ### Changed
 
+* Minimum Rust version is now `1.31.0` &ndash; Rust 2018. ([#1224])
 * `Transform::look_at` renamed to `Transform::face_towards` and behavior fixed. ([#1142])
 * `Material` animations now directly use `Handle<Texture>` instead of using indirection. ([#1089])
 * `SpriteRenderPrimitive::SpriteSheet` now takes `Handle<SpriteSheet>` instead of a `u64` ID. ([#1089])
@@ -43,6 +44,7 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 * Renamed the `DrawSprite` pass to `DrawFlat2D` as it now handles both sprites and images without spritesheets. ([#1153])
 * `BasicScenePrefab` deserialization now returns an error on invalid fields. ([#1164])
 * Reordered arguments for `Transform::set_rotation_euler` to match nalgebra's Euler angles. ([#1052])
+* Remove lifetimes from `SimpleState` ([#1198])
 
 ### Removed
 
@@ -85,6 +87,8 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 [#1184]: https://github.com/amethyst/amethyst/pull/1184
 [#1187]: https://github.com/amethyst/amethyst/pull/1187
 [#1188]: https://github.com/amethyst/amethyst/pull/1188
+[#1198]: https://github.com/amethyst/amethyst/pull/1198
+[#1224]: https://github.com/amethyst/amethyst/pull/1224
 [winit_018]: https://github.com/tomaka/winit/blob/v0.18.0/CHANGELOG.md#version-0180-2018-11-07
 [glutin_019]: https://github.com/tomaka/glutin/blob/master/CHANGELOG.md#version-0190-2018-11-09
 
@@ -703,3 +707,4 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 [0.4.1]: https://github.com/amethyst/amethyst/compare/v0.4...v0.4.1
 [0.4.0]: https://github.com/amethyst/amethyst/compare/v0.3.1...v0.4
 [0.3.1]: https://github.com/amethyst/amethyst/compare/v0.3...v0.3.1
+

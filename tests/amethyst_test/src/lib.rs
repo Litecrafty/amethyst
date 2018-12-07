@@ -46,7 +46,7 @@
 //! # where
 //! #     E: Send + Sync + 'static,
 //! # {
-//! #     fn update(&mut self, data: StateData<GameData>) -> Trans<GameData<'a, 'b>, E> {
+//! #     fn update(&mut self, data: StateData<'_, GameData<'_, '_>>) -> Trans<GameData<'a, 'b>, E> {
 //! #         data.data.update(&data.world);
 //! #
 //! #         data.world.add_resource(LoadResource);
@@ -307,13 +307,13 @@
 //! # }
 //! ```
 
-extern crate amethyst;
-extern crate boxfnonce;
+use amethyst;
+
 #[macro_use]
 extern crate derivative;
 #[macro_use]
 extern crate derive_new;
-extern crate hetseq;
+
 #[macro_use]
 extern crate lazy_static;
 

@@ -56,14 +56,14 @@ We will leave it empty for now, but it will become useful later down the line.
 # extern crate amethyst;
 # use amethyst::prelude::*;
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
-fn on_start(&mut self, data: StateData<GameData>) {
+# impl SimpleState for MyState {
+fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
 
 }
 # }
 ```
 
-The `StateData<GameData>` is a structure given to all State methods. The important
+The `StateData<'_, GameData<'_, '_>>` is a structure given to all State methods. The important
 part of its content here is its `world` field.
 
 The `World` structure gets passed around everywhere. It carries with it all the
@@ -141,8 +141,8 @@ our State's `on_start` method:
 # use amethyst::ecs::World;
 # fn initialise_camera(world: &mut World) { }
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
-fn on_start(&mut self, data: StateData<GameData>) {
+# impl SimpleState for MyState {
+fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
     let world = data.world;
 
     initialise_camera(world);
@@ -289,8 +289,8 @@ compiles. Update the `on_start` method to the following:
 # fn initialise_paddles(world: &mut World) { }
 # fn initialise_camera(world: &mut World) { }
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
-fn on_start(&mut self, data: StateData<GameData>) {
+# impl SimpleState for MyState {
+fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
     let world = data.world;
 
     initialise_paddles(world);
@@ -383,7 +383,7 @@ fn main() -> amethyst::Result<()> {
 #       .with_pass(DrawFlat2D::new()),
 # );
 # struct Pong;
-# impl<'a, 'b> SimpleState<'a, 'b> for Pong { }
+# impl SimpleState for Pong { }
     let game_data = GameDataBuilder::default()
         .with_bundle(
           RenderBundle::new(pipe, Some(config))
@@ -602,8 +602,8 @@ all together in the `on_start()` method:
 # fn initialise_camera(world: &mut World) { }
 # fn load_sprite_sheet(world: &mut World) -> SpriteSheetHandle { unimplemented!() }
 # struct MyState;
-# impl<'a, 'b> SimpleState<'a, 'b> for MyState {
-fn on_start(&mut self, data: StateData<GameData>) {
+# impl SimpleState for MyState {
+fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
     let world = data.world;
 
     // Load the spritesheet necessary to render the graphics.

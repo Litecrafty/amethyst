@@ -1,7 +1,6 @@
 //! Demonstrates loading prefabs using the Amethyst engine.
 
-extern crate amethyst;
-extern crate rayon;
+use amethyst;
 
 use amethyst::{
     assets::{PrefabLoader, PrefabLoaderSystem, RonFormat},
@@ -16,9 +15,9 @@ type MyPrefabData = BasicScenePrefab<Vec<PosNormTex>>;
 
 struct AssetsExample;
 
-impl<'a, 'b> SimpleState<'a, 'b> for AssetsExample {
-    fn on_start(&mut self, data: StateData<GameData>) {
-        let prefab_handle = data.world.exec(|loader: PrefabLoader<MyPrefabData>| {
+impl SimpleState for AssetsExample {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let prefab_handle = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
             loader.load("prefab/example.ron", RonFormat, (), ())
         });
         data.world.create_entity().with(prefab_handle).build();

@@ -1,6 +1,6 @@
 //! Displays a shaded sphere to the user.
 
-extern crate amethyst;
+use amethyst;
 
 use amethyst::{
     assets::{PrefabLoader, PrefabLoaderSystem, RonFormat},
@@ -14,9 +14,9 @@ type MyPrefabData = BasicScenePrefab<ComboMeshCreator>;
 
 struct Example;
 
-impl<'a, 'b> SimpleState<'a, 'b> for Example {
-    fn on_start(&mut self, data: StateData<GameData>) {
-        let handle = data.world.exec(|loader: PrefabLoader<MyPrefabData>| {
+impl SimpleState for Example {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let handle = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
             loader.load("prefab/sphere.ron", RonFormat, (), ())
         });
         data.world.create_entity().with(handle).build();

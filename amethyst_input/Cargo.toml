@@ -2,6 +2,7 @@
 name = "amethyst_input"
 version = "0.5.0"
 authors = ["Rhuagh <seamonr@gmail.com>", "Xaeroxe <kieseljake@gmail.com>"]
+edition = "2018"
 description = "Input rebinding "
 
 documentation = "https://www.amethyst.rs/doc/master/doc/amethyst_input/"
@@ -17,6 +18,7 @@ travis-ci = { repository = "amethyst/amethyst" }
 [dependencies]
 amethyst_core = { path = "../amethyst_core/", version = "0.4.0" }
 amethyst_config = { path = "../amethyst_config/", version = "0.8.0" }
+amethyst_renderer = { path = "../amethyst_renderer/", version = "0.9.0" }
 derivative = "1.0"
 fnv = "1"
 serde = { version = "1", features = ["serde_derive"] }

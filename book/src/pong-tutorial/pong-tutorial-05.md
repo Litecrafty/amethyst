@@ -286,8 +286,8 @@ use amethyst::{
 # 
 # pub struct Pong;
 # 
-# impl<'a, 'b> SimpleState<'a, 'b> for Pong {
-#     fn on_start(&mut self, data: StateData<GameData>) {
+# impl SimpleState for Pong {
+#     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
 #         let world = data.world;
 # 
 #         // Load the spritesheet necessary to render the graphics.
@@ -487,8 +487,8 @@ use amethyst::{
 # 
 # pub struct Pong;
 # 
-impl<'a, 'b> SimpleState<'a, 'b> for Pong {
-    fn on_start(&mut self, data: StateData<GameData>) {
+impl SimpleState for Pong {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
 #         let world = data.world;
 #
 #         // Load the spritesheet necessary to render the graphics.

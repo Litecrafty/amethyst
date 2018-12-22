@@ -13,10 +13,12 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 
 * Introduce `application_dir` utility ([#1213])
 * Derive `Copy`, `PartialEq`, `Eq`, `Serialize`, `Deserialize` for `Flipped` component. ([#1237])
+* A way to change the default `Source` using `set_default_source` and `with_default_source`. ([#1256])
 
 ### Changed
 
 * Make `application_root_dir` return a `Result<Path>` instead of a `String` ([#1213])
+* Remove unnecessary texture coordinates offset in `Sprite::from_pixel_values` ([#1267])
 
 ### Removed
 
@@ -24,6 +26,8 @@ The format is based on [Keep a Changelog][kc], and this project adheres to
 
 [#1213]: https://github.com/amethyst/amethyst/pull/1213
 [#1237]: https://github.com/amethyst/amethyst/pull/1237
+[#1256]: https://github.com/amethyst/amethyst/pull/1256
+[#1267]: https://github.com/amethyst/amethyst/pull/1267
 
 ## [0.10.0] - 2018-12
 

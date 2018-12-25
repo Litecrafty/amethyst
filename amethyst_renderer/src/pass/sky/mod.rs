@@ -72,7 +72,7 @@ impl DrawSkyBox {
 
 impl<'a> PassData<'a> for DrawSkyBox {
     type Data = (
-        Option<Read<'a, ActiveCamera>>,
+        Read<'a, ActiveCamera>,
         ReadStorage<'a, Camera>,
         Read<'a, AssetStorage<Texture>>,
         ReadExpect<'a, MaterialDefaults>,

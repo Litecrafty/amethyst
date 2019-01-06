@@ -14,7 +14,7 @@
 [tc]: https://travis-ci.org/amethyst/amethyst/
 [ci]: https://crates.io/crates/amethyst/
 [li]: COPYING
-[di]: https://discord.gg/GnP5Whs
+[di]: https://discord.gg/amethyst
 
 ## What is Amethyst?
 
@@ -163,7 +163,7 @@ If you have a question, feel free to ask on our [Discord server][di] and we'll h
 Other places you may want to check out are [r/rust_gamedev][rg] and [#rust-gamedev IRC][irc].
 
 [faq]: https://github.com/amethyst/amethyst/wiki/Frequently-Asked-Questions
-[di]: https://discord.gg/GnP5Whs
+[di]: https://discord.gg/amethyst
 [rg]: https://www.reddit.com/r/rust_gamedev/
 [irc]: https://botbot.me/mozilla/rust-gamedev/
 
@@ -192,7 +192,7 @@ you can look through the [issue tracker][it].
 
 ## Backers
 
-Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/amethyst#backer)
+Thank you to all our backers! 🙏 [Become a backer](https://www.amethyst-engine.org/donate)
 
 <a href="https://opencollective.com/amethyst#backers" target="_blank"><img src="https://opencollective.com/amethyst/backers.svg?width=890"></a>
 

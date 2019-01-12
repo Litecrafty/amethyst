@@ -64,6 +64,7 @@ where
     );
 
     fn run(&mut self, (input, mut handler, mut output, screen_dimensions): Self::SystemData) {
+        handler.reset();
         for event in input.read(
             &mut self
                 .reader

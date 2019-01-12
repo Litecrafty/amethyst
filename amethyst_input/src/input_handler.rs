@@ -41,6 +41,10 @@ where
     /// while second is the ID used by incoming events.
     connected_controllers: SmallVec<[(u32, u32); 8]>,
     mouse_position: Option<(f64, f64)>,
+    pressed_keys_last_frame: SmallVec<[(VirtualKeyCode, u32); 12]>,
+    released_keys_last_frame: SmallVec<[(VirtualKeyCode, u32); 12]>,
+    pressed_mouse_buttons_last_frame: SmallVec<[MouseButton; 12]>,
+    pressed_controller_buttons_last_frame: SmallVec<[(u32, ControllerButton); 12]>,
 }
 
 impl<AX, AC> InputHandler<AX, AC>
@@ -59,6 +63,16 @@ where
     AX: Hash + Eq + Clone + Send + Sync + 'static,
     AC: Hash + Eq + Clone + Send + Sync + 'static,
 {
+    /// Resets all one-off button and action states
+    ///
+    /// The Amethyst game engine will automatically call this if the InputHandler is attached to
+    /// the world as a resource before new input events are processed.
+    pub fn reset(&mut self) {
+        self.pressed_keys_last_frame.truncate(0);
+        self.released_keys_last_frame.truncate(0);
+        self.pressed_mouse_buttons_last_frame.truncate(0);
+    }
+
     /// Updates the input handler with a new engine event.
     ///
     /// The Amethyst game engine will automatically call this if the InputHandler is attached to
@@ -86,6 +100,7 @@ where
                 } => {
                     if self.pressed_keys.iter().all(|&k| k.0 != key_code) {
                         self.pressed_keys.push((key_code, scancode));
+                        self.pressed_keys_last_frame.push((key_code, scancode));
                         event_handler.iter_write(
                             [
                                 KeyPressed { key_code, scancode },
@@ -123,6 +138,7 @@ where
                     let index = self.pressed_keys.iter().position(|&k| k.0 == key_code);
                     if let Some(i) = index {
                         self.pressed_keys.swap_remove(i);
+                        self.released_keys_last_frame.push((key_code, scancode));
                         event_handler.iter_write(
                             [
                                 KeyReleased { key_code, scancode },
@@ -166,6 +182,7 @@ where
                         .all(|&b| b != mouse_button)
                     {
                         self.pressed_mouse_buttons.push(mouse_button);
+                        self.pressed_mouse_buttons_last_frame.push(mouse_button);
                         event_handler.iter_write(
                             [
                                 MouseButtonPressed(mouse_button),
@@ -394,6 +411,11 @@ where
         self.pressed_keys.iter().any(|&k| k.0 == key)
     }
 
+    /// Checks if a key was pressed last frame.
+    pub fn key_was_pressed(&self, key: VirtualKeyCode) -> bool {
+        self.pressed_keys_last_frame.iter().any(|&k| k.0 == key)
+    }
+
     /// Returns an iterator over all pressed mouse buttons
     pub fn mouse_buttons_that_are_down(&self) -> impl Iterator<Item = &MouseButton> {
         self.pressed_mouse_buttons.iter()
@@ -406,6 +428,13 @@ where
             .any(|&mb| mb == mouse_button)
     }
 
+    /// Checks if a mouse button was pressed.
+    pub fn mouse_button_was_pressed(&self, mouse_button: MouseButton) -> bool {
+        self.pressed_mouse_buttons_last_frame
+            .iter()
+            .any(|&mb| mb == mouse_button)
+    }
+
     /// Returns an iterator over all pressed scan codes
     pub fn scan_codes_that_are_down(&self) -> impl Iterator<Item = u32> + '_ {
         self.pressed_keys.iter().map(|k| k.1)
@@ -414,6 +443,11 @@ where
     /// Checks if the key corresponding to a scan code is down.
     pub fn scan_code_is_down(&self, scan_code: u32) -> bool {
         self.pressed_keys.iter().any(|&k| k.1 == scan_code)
+    }
+
+    /// Checks if the key corresponding to a scan code was pressed last frame.
+    pub fn scan_code_was_pressed(&self, scan_code: u32) -> bool {
+        self.pressed_keys_last_frame.iter().any(|&k| k.1 == scan_code)
     }
 
     /// Returns an iterator over all pressed controller buttons on all controllers.
@@ -430,6 +464,17 @@ where
         controller_button: ControllerButton,
     ) -> bool {
         self.pressed_controller_buttons
+            .iter()
+            .any(|&(id, b)| id == controller_id && b == controller_button)
+    }
+
+    /// Checks if a controller button was pressed last frame on specific controller.
+    pub fn controller_button_was_pressed(
+        &self,
+        controller_id: u32,
+        controller_button: ControllerButton,
+    ) -> bool {
+        self.pressed_controller_buttons_last_frame
             .iter()
             .any(|&(id, b)| id == controller_id && b == controller_button)
     }
@@ -478,6 +523,17 @@ where
             Button::Mouse(b) => self.mouse_button_is_down(b),
             Button::ScanCode(s) => self.scan_code_is_down(s),
             Button::Controller(g, b) => self.controller_button_is_down(g, b),
+            _ => false,
+        }
+    }
+
+    /// Checks if a button was pressed last frame.
+    pub fn button_was_pressed(&self, button: Button) -> bool {
+        match button {
+            Button::Key(k) => self.key_was_pressed(k),
+            Button::Mouse(b) => self.mouse_button_was_pressed(b),
+            Button::ScanCode(s) => self.scan_code_was_pressed(s),
+            Button::Controller(g, b) => self.controller_button_was_pressed(g, b),
             _ => false,
         }
     }
@@ -535,6 +591,22 @@ where
                 combination
                     .iter()
                     .all(|button| self.button_is_down(*button))
+            })
+        })
+    }
+
+    /// Returns true if any of the actions bindings was pressed last frame.
+    ///
+    /// If a binding represents a combination of buttons, all of them need to be down.
+    pub fn action_was_pressed<T: Hash + Eq + ?Sized>(&self, action: &T) -> Option<bool>
+    where
+        AC: Borrow<T>,
+    {
+        self.bindings.actions.get(action).map(|combinations| {
+            combinations.iter().any(|combination| {
+                combination
+                    .iter()
+                    .all(|button| self.button_was_pressed(*button))
             })
         })
     }

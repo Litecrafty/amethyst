@@ -3,7 +3,7 @@ use std::result::Result as StdResult;
 use error_chain::bail;
 use gfx::{
     format::{ChannelType, SurfaceType, SurfaceTyped},
-    texture::{Kind, SamplerInfo},
+    texture::{AaMode, Kind, SamplerInfo},
     traits::Pod,
 };
 use image::{DynamicImage, ImageFormat, RgbaImage};
@@ -578,7 +578,7 @@ impl SimpleFormat<Texture> for TextureFormat {
 
 mod serde_helper {
     use crate::tex::{FilterMethod, WrapMode};
-    use crate::gfx::texture::{AaMode, Kind};
+    use super::{AaMode, Kind};
 
     use super::SamplerInfo;
 

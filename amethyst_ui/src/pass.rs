@@ -5,20 +5,20 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use fnv::FnvHashMap as HashMap;
-use fnv::FnvHashSet as HashSet;
-use gfx::preset::blend;
-use gfx::pso::buffer::ElemStride;
-use gfx::state::ColorMask;
+use derive_new::new;
+use fnv::{FnvHashMap as HashMap, FnvHashSet as HashSet};
+use gfx::{preset::blend, pso::buffer::ElemStride, state::ColorMask};
 use gfx_glyph::{
     BuiltInLineBreaker, FontId, GlyphBrush, GlyphBrushBuilder, GlyphCruncher, Layout, Point, Scale,
     SectionText, VariedSection,
 };
 use glsl_layout::{vec2, vec4, Uniform};
 use hibitset::BitSet;
+use log::error;
+use unicode_segmentation::UnicodeSegmentation;
+
 #[cfg(feature = "profiler")]
 use thread_profiler::profile_scope;
-use unicode_segmentation::UnicodeSegmentation;
 
 use amethyst_assets::{AssetStorage, Handle, Loader};
 use amethyst_core::specs::prelude::{

@@ -1,15 +1,17 @@
 //! Texture resource.
 
+use error_chain::bail;
 pub use gfx::{
     format::{ChannelType, SurfaceType},
-    texture::{FilterMethod, SamplerInfo, WrapMode},
+    texture::{FilterMethod, Info, Mipmap, SamplerInfo, WrapMode},
+    traits::Pod,
 };
+use serde::{Deserialize, Serialize};
 
 use std::marker::PhantomData;
 
 use gfx::{
-    texture::{AaMode, Info, Kind, Mipmap},
-    traits::Pod,
+    texture::{AaMode, Kind},
 };
 
 use amethyst_assets::{Asset, Handle};

@@ -7,7 +7,9 @@ use std::{
     hash::Hash,
 };
 
+use derivative::Derivative;
 use fnv::FnvHashMap as HashMap;
+use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 
 use super::{Axis, Button};
@@ -403,8 +405,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::button::*;
-    use crate::controller::ControllerAxis;
+    use crate::{button::*, controller::ControllerAxis};
     use winit::{MouseButton, VirtualKeyCode};
 
     #[test]

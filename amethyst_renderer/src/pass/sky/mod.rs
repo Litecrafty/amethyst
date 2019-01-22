@@ -5,12 +5,13 @@ use amethyst_core::{
     transform::GlobalTransform,
 };
 
+use amethyst_error::Error;
+
 use gfx::pso::buffer::{ElemStride, Element};
 use gfx::texture::Kind;
 use glsl_layout::*;
 
 use crate::cam::{ActiveCamera, Camera};
-use crate::error::Result;
 use crate::formats::{ImageData, TextureData, TextureMetadata};
 use crate::mesh::Mesh;
 use crate::mtl::MaterialDefaults;
@@ -82,7 +83,7 @@ impl<'a> PassData<'a> for DrawSkyBox {
 }
 
 impl Pass for DrawSkyBox {
-    fn compile(&mut self, mut effect: NewEffect<'_>) -> Result<Effect> {
+    fn compile(&mut self, mut effect: NewEffect<'_>) -> Result<Effect, Error> {
         let data: Vec<PosOnly> = SKYBOX_VERTICES
             .iter()
             .map(|v| PosOnly {

@@ -18,7 +18,6 @@ use amethyst_core::specs::prelude::DenseVecStorage;
 use amethyst_error::Error;
 
 use crate::{
-    error,
     formats::TextureData,
     types::{ChannelFormat, Factory, RawShaderResourceView, RawTexture, Sampler, SurfaceFormat},
 };

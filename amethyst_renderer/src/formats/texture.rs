@@ -513,13 +513,13 @@ fn create_cubemap_asset_from_images(
     images: [ImageData; 6],
     options: TextureMetadata,
     renderer: &mut Renderer,
-) -> Result<Texture> {
+) -> Result<Texture, Error> {
     let fmt = SurfaceType::R8_G8_B8_A8;
     let rgba = &images[0].rgba;
     let w = rgba.width();
     let h = rgba.height();
     if w > u16::max_value() as u32 || h > u16::max_value() as u32 {
-        bail!(
+        panic!(
             "Unsupported texture size (expected: ({}, {}), got: ({}, {})",
             u16::max_value(),
             u16::max_value(),
@@ -538,7 +538,7 @@ fn create_cubemap_asset_from_images(
     );
     renderer
         .create_texture(tb)
-        .chain_err(|| "Failed to create texture from texture data")
+        .with_context(|_| error::Error::CreateTextureError)
 }
 
 /// Aggregate texture format

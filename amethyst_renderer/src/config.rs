@@ -1,7 +1,7 @@
 //! Renderer configuration.
 
 use serde::{Deserialize, Serialize};
-use winit::{self, dpi::LogicalSize, WindowBuilder};
+use winit::{self, dpi::LogicalSize, Icon, WindowBuilder};
 
 /// Structure for holding the renderer configuration.
 ///
@@ -37,6 +37,9 @@ pub struct DisplayConfig {
     /// Maximum window dimensions, measured in pixels (px).
     #[serde(default)]
     pub max_dimensions: Option<(u32, u32)>,
+    /// Path to window icon.
+    #[serde(default)]
+    pub icon: Option<String>,
     /// Enables or disables vertical synchronization.
     #[serde(default = "default_vsync")]
     pub vsync: bool,
@@ -56,6 +59,7 @@ impl Default for DisplayConfig {
             dimensions: None,
             min_dimensions: None,
             max_dimensions: None,
+            icon: None,
             vsync: default_vsync(),
             multisampling: default_multisampling(),
             visibility: default_visibility(),
@@ -79,7 +83,7 @@ impl DisplayConfig {
     /// Creates a `winit::WindowBuilder` using the values set in the DisplayConfig
     ///
     /// The EventsLoop is needed to configure a fullscreen window
-    pub fn to_windowbuilder(self, el: winit::EventsLoop) -> WindowBuilder {
+    pub fn to_windowbuilder(self, el: &winit::EventsLoop) -> WindowBuilder {
         use winit::WindowAttributes;
         let attrs = WindowAttributes {
             dimensions: self.dimensions.map(into_logical_size),
@@ -95,6 +99,10 @@ impl DisplayConfig {
 
         if self.fullscreen {
             builder = builder.with_fullscreen(Some(el.get_primary_monitor()));
+        }
+
+        if let Some(icon) = self.icon {
+            builder = builder.with_window_icon(Icon::from_path(icon).ok());
         }
 
         builder

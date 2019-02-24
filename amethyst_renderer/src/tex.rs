@@ -9,9 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use std::marker::PhantomData;
 
-use gfx::{
-    texture::{AaMode, Kind},
-};
+use gfx::texture::{AaMode, Kind};
 
 use amethyst_assets::{Asset, Handle};
 use amethyst_core::specs::prelude::DenseVecStorage;

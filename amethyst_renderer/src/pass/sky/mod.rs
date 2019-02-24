@@ -7,20 +7,26 @@ use amethyst_core::{
 
 use amethyst_error::Error;
 
-use gfx::pso::buffer::{ElemStride, Element};
-use gfx::texture::Kind;
+use gfx::{
+    pso::buffer::{ElemStride, Element},
+    texture::Kind,
+};
 use glsl_layout::*;
 
-use crate::cam::{ActiveCamera, Camera};
-use crate::formats::{ImageData, TextureData, TextureMetadata};
-use crate::mesh::Mesh;
-use crate::mtl::MaterialDefaults;
-use crate::pass::util::get_camera;
-use crate::pipe::pass::{Pass, PassData};
-use crate::pipe::{Effect, NewEffect};
-use crate::tex::{Texture, TextureHandle};
-use crate::types::{Encoder, Factory};
-use crate::vertex::{Attribute, AttributeFormat, Attributes, Position, VertexFormat, With};
+use crate::{
+    cam::{ActiveCamera, Camera},
+    formats::{ImageData, TextureData, TextureMetadata},
+    mesh::Mesh,
+    mtl::MaterialDefaults,
+    pass::util::get_camera,
+    pipe::{
+        pass::{Pass, PassData},
+        Effect, NewEffect,
+    },
+    tex::{Texture, TextureHandle},
+    types::{Encoder, Factory},
+    vertex::{Attribute, AttributeFormat, Attributes, Position, VertexFormat, With},
+};
 
 const VERT_SRC: &[u8] = include_bytes!("../shaders/vertex/sky.glsl");
 const FRAG_SRC: &[u8] = include_bytes!("../shaders/fragment/sky.glsl");
@@ -88,7 +94,8 @@ impl Pass for DrawSkyBox {
             .iter()
             .map(|v| PosOnly {
                 position: v.clone(),
-            }).collect();
+            })
+            .collect();
         self.mesh = Some(Mesh::build(data).build(&mut effect.factory)?);
         use std::mem;
         effect
@@ -98,7 +105,8 @@ impl Pass for DrawSkyBox {
                 "VertexArgs",
                 mem::size_of::<<VertexArgs as Uniform>::Std140>(),
                 1,
-            ).with_texture("top")
+            )
+            .with_texture("top")
             .with_output("color", None)
             .build()
     }
@@ -116,7 +124,7 @@ impl Pass for DrawSkyBox {
             global,
             skybox,
         ): <Self as PassData<'a>>::Data,
-){
+    ) {
         let camera = get_camera(active, &camera, &global);
         let vertex_args = camera
             .as_ref()
@@ -127,7 +135,8 @@ impl Pass for DrawSkyBox {
                     proj: proj.into(),
                     view: view.into(),
                 }
-            }).unwrap_or_else(|| {
+            })
+            .unwrap_or_else(|| {
                 let proj: [[f32; 4]; 4] = na::Matrix4::identity().into();
                 let view: [[f32; 4]; 4] = na::Matrix4::identity().into();
                 VertexArgs {
@@ -196,10 +205,8 @@ where
 }
 
 fn load_texture<P: Into<String>>(path: P) -> ImageData {
-    use image::load_from_memory;
-    use image::DynamicImage;
-    use std::fs::File;
-    use std::io::Read;
+    use image::{load_from_memory, DynamicImage};
+    use std::{fs::File, io::Read};
 
     let mut data = Vec::new();
     let mut file = File::open(path.into()).unwrap();
@@ -214,7 +221,8 @@ fn load_texture<P: Into<String>>(path: P) -> ImageData {
                     image.to_rgba()
                 }
             }
-        }).map(|rgba| ImageData { rgba })
+        })
+        .map(|rgba| ImageData { rgba })
         .unwrap()
 }
 

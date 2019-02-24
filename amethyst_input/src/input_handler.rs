@@ -448,7 +448,9 @@ where
 
     /// Checks if the key corresponding to a scan code was pressed last frame.
     pub fn scan_code_was_pressed(&self, scan_code: u32) -> bool {
-        self.pressed_keys_last_frame.iter().any(|&k| k.1 == scan_code)
+        self.pressed_keys_last_frame
+            .iter()
+            .any(|&k| k.1 == scan_code)
     }
 
     /// Returns an iterator over all pressed controller buttons on all controllers.

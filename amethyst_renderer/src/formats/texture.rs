@@ -527,8 +527,12 @@ fn create_cubemap_asset_from_images(
             h
         );
     }
-    
-    let data: Vec<u8> = images.iter().map(|val| val.clone().rgba.into_raw()).flat_map(|v| v).collect();
+
+    let data: Vec<u8> = images
+        .iter()
+        .map(|val| val.clone().rgba.into_raw())
+        .flat_map(|v| v)
+        .collect();
 
     let tb = apply_options(
         TextureBuilder::new(data)
@@ -570,8 +574,8 @@ impl SimpleFormat<Texture> for TextureFormat {
 }
 
 mod serde_helper {
-    use crate::tex::{FilterMethod, WrapMode};
     use super::{AaMode, Kind};
+    use crate::tex::{FilterMethod, WrapMode};
 
     use super::SamplerInfo;
 

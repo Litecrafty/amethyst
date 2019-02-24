@@ -48,10 +48,9 @@ pub use crate::{
     mesh::{vertex_data, Mesh, MeshBuilder, MeshHandle, VertexBuffer},
     mtl::{Material, MaterialDefaults, TextureOffset},
     pass::{
-        get_camera, set_vertex_args, DebugLinesParams, DrawDebugLines, DrawFlat, DrawFlat2D,
-        DrawFlatSeparate, DrawPbm, DrawPbmSeparate, DrawShaded, DrawShadedSeparate, DrawSkybox,
-        SkyboxColor,
-        DrawSkyBox, SkyBox, load_cubemap,
+        get_camera, load_cubemap, set_vertex_args, DebugLinesParams, DrawDebugLines, DrawFlat,
+        DrawFlat2D, DrawFlatSeparate, DrawPbm, DrawPbmSeparate, DrawShaded, DrawShadedSeparate,
+        DrawSkyBox, DrawSkybox, SkyBox, SkyboxColor,
     },
     pipe::{
         ColorBuffer, Data, DepthBuffer, DepthMode, Effect, EffectBuilder, Init, Meta, NewEffect,
